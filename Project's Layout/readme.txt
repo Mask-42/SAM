@@ -1,4 +1,4 @@
-Thanks for downloading this theme!
+
 
 Theme Name: Bocor
 Theme URL: https://bootstrapmade.com/bocor-bootstrap-template-nice-animation/
