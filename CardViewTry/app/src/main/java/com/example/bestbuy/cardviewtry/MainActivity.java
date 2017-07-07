@@ -1,5 +1,6 @@
 package com.example.bestbuy.cardviewtry;
 
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<DataProvider> results;  //This is the Data which is being sent to the MyAdapter Class
     RecyclerView rv1;  //This is the instantiation of RecyclerView
     //**The REYCLERVIEW needs two things,   Adapter and  LayoutManager
+
     RecyclerView.Adapter my_adapter;
     RecyclerView.LayoutManager my_LM;
     Button b1;
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DataProvider temp= new DataProvider("Newly Added Main "+(j+1),"Newly Added Comment "+(j+1));
+                DataProvider temp= new DataProvider("Newly Added Main "+(j+1),"Newly Added Comment "+(j+1),"Hidden "+(j+1),"Second Hidden"+(j+1));
                 j++;
                 addItem(temp); //This is a method defined below
             }
@@ -77,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
     //************The createHelperCallback Method*************
     private ItemTouchHelper.Callback createHelperCallback() {
+final float ALPHA_FULL=1.0f;
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = //We Make an object of SimpleCallback which enables us to add the gestures
 
                 new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,   //The first two i.e. up or down are for the move operation
@@ -102,6 +105,19 @@ public class MainActivity extends AppCompatActivity {
                         super.onSelectedChanged(viewHolder, actionState);
                         final boolean swiping = actionState == ItemTouchHelper.ACTION_STATE_DRAG;
                         srl.setEnabled(!swiping);
+                    }
+
+                    //*******This is the Method buy which the fade-out animation is put on the Swipe of Card********
+                    @Override
+                    public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                        if(actionState==ItemTouchHelper.ACTION_STATE_SWIPE){
+                            final float alpha = ALPHA_FULL-Math.abs(dX)/(float)viewHolder.itemView.getWidth();
+                            viewHolder.itemView.setAlpha(alpha);
+                            viewHolder.itemView.setTranslationX(dX);
+                        }
+                        else{
+                            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                        }
                     }
                 };
         return simpleItemTouchCallback;
@@ -133,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<DataProvider> getDataSet(){
         results= new ArrayList<DataProvider>();
         for(int i=0;i<6;i++){
-            DataProvider obj=new DataProvider("The Main Text "+(i+1),"The Comment Text "+(i+1));
+            DataProvider obj=new DataProvider("The Main Text "+(i+1),"The Comment Text "+(i+1),"Hidden "+(i+1),"Second Hidden"+(i+1));
             results.add(i,obj);
         }
         return results;  //This returns the ArrayList of the objects of DataProvider Class*********
