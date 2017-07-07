@@ -3,7 +3,7 @@ package com.example.bestbuy.cardviewtry;
 /**
  * Created by Best Buy on 07-07-2017.
  */
-
+//***************This is just a simple class which is used to supply data in the form of its objects***********
 public class DataProvider {
 
     private String text1,text2;
