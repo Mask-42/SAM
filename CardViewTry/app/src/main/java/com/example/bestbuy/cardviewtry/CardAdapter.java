@@ -17,16 +17,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Created by Best Buy on 07-07-2017.
  */
 //*********User-defined Adapter which extends RecyclerView.Adapter**********
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.DataObjectHolder> {
-    ArrayList<DataProvider> DataSet;
-    private static MyClickListener myClickListener; //MyClickListener is an interface defined internally later
-
+public class CardAdapter extends RecyclerView.Adapter<CardAdapter.DataObjectHolder> {
+    LinkedList<DataProvider> DataSet;
     private int lastPos=-1; //This is the last position of the item...helpful in animation
     Context con;
 
@@ -36,7 +34,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.DataObjectHolder> 
 
     //************DataObjectHolder is needed to hold all the data received by this class in the form of DataSet********
     //In this we give Id and all to the widgets used inside the Card View i.e. activity_main
-    public static class DataObjectHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class DataObjectHolder extends RecyclerView.ViewHolder {
 
         TextView t1,t2,t3,t4;   //The number of TextViews have increased since Last Commit
 
@@ -56,30 +54,18 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.DataObjectHolder> 
             upper=(LinearLayout)itemView.findViewById(R.id.Upper);
             expandable=(LinearLayout)itemView.findViewById(R.id.expandableLayout);
 
-            itemView.setOnClickListener(this);//This will be used on user clicks on the CardView
-        }
-
-        @Override
-        public void onClick(View view) {
-         //It is incomplete as if now...that is why app will crash when you click on any on e of the Cards
-            myClickListener.onItemClick(getAdapterPosition(),view);
         }
     }
 
 
 
     //**********The Constructor for this class which is receiving data from the MainActivity*********
-    public MyAdapter(ArrayList<DataProvider> newDataSet,Context con){
+    public CardAdapter(LinkedList<DataProvider> newDataSet,Context con){
         this.con=con;
         DataSet=newDataSet;
         for(int i=0;i<DataSet.size();i++){
             expandState.append(i,false);   //Here the expandState of all the Cards is initially set to false
         }
-    }
-
-    //I don't know what this one does right no...will try to figure out soon plus right now it is not used anywhere
-    public void setItemOnClickListener(MyClickListener myClickListener){
-        this.myClickListener=myClickListener;
     }
 
 
@@ -208,8 +194,4 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.DataObjectHolder> 
         return DataSet.size();
     }
 
-    //***********This is the MyClickListener interface used above *****************
-    public interface MyClickListener{
-        public void onItemClick(int position,View v);
-    }
 }
