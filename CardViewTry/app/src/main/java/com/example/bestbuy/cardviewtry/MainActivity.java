@@ -48,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
         {
             setTitle("Recent Received Calls");
-            srl.setRefreshing(false);
+            srl=(SwipeRefreshLayout)findViewById(R.id.swipe1);
+            srl.setEnabled(false);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
