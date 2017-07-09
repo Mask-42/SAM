@@ -1,9 +1,21 @@
 package com.example.bestbuy.cardviewtry;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
+import android.provider.ContactsContract;
+import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -12,66 +24,93 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import android.text.format.DateFormat;
+import android.widget.Toast;
+
 import java.util.Calendar;
 
-public class AddAppointmentActivity extends AppCompatActivity implements View.OnClickListener,DatePickerDialog.OnDateSetListener,TimePickerDialog.OnTimeSetListener {
+public class AddAppointmentActivity extends AppCompatActivity implements View.OnClickListener,DatePickerDialog.OnDateSetListener,TimePickerDialog.OnTimeSetListener, View.OnFocusChangeListener {
 EditText time,date;
     TextView phone_no;
     Button submit;
-
+    String Phone;
     int year,month,day,hours,minutes;
     int yearF,monthF,dayF,hoursF,minutesF;
+    ConstraintLayout con;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_appointment);
         Bundle bundle=getIntent().getExtras();
-        String Phone=bundle.getString("Phone");
-        
+        Phone=bundle.getString("Phone");
+
         setTitle("Fix Appointment");
         time=(EditText)findViewById(R.id.Time);
         date=(EditText)findViewById(R.id.Date);
         phone_no=(TextView)findViewById(R.id.PhoneText);
         submit=(Button)findViewById(R.id.Submit1);
+        con=(ConstraintLayout)findViewById(R.id.Constraint1);
+        con.requestFocus();
 
 
         phone_no.setText(Phone);
-        time.setOnClickListener(this);
-        date.setOnClickListener(this);
+        //time.setOnClickListener(this);
+        time.setOnFocusChangeListener(this);
+        date.setOnFocusChangeListener(this);
+        //date.setOnClickListener(this);
         submit.setOnClickListener(this);
 
     }
 
+    private void sendSMS(){
+        String Message="Your request for the Appointment has been accepted, please visit the following link to complete the process.YOUR URL HERE";
+        SmsManager sm1=SmsManager.getDefault();
+        PendingIntent pi=PendingIntent.getBroadcast(this,1,new Intent("com.example.bestbuy.cardviewtry.smssent"),0);
+        sm1.sendTextMessage(Phone,null,Message,pi,null); //phone number, copy number, message context, pending intent, delivery pending intent
+
+        registerReceiver(br1,new IntentFilter("com.example.bestbuy.cardviewtry.smssent"));
+
+    }
+
+    BroadcastReceiver br1=new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String status="";
+            boolean error=true;
+
+            switch (getResultCode()){
+                case Activity.RESULT_OK:
+                    error=false;
+                    status="Message Sent";
+                    break;
+                case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                    status="Error";
+                    break;
+                case SmsManager.RESULT_ERROR_NO_SERVICE:
+                    status="No Service";
+                    break;
+                case SmsManager.RESULT_ERROR_NULL_PDU:
+                    status="No Data";
+                    break;
+                case SmsManager.RESULT_ERROR_RADIO_OFF:
+                    status="Airplane Mode On";
+                    break;
+            }
+            Toast t=Toast.makeText(context, status, Toast.LENGTH_SHORT);
+            t.getView().setBackgroundColor(error? Color.RED: Color.GREEN);
+            t.show();
+        }
+    };
     @Override
     public void onClick(View view) {
 
         switch (view.getId()){
             case R.id.Submit1:
 
+                String[] perms = new String[]{Manifest.permission.SEND_SMS};
+                ActivityCompat.requestPermissions(this, perms, 30);
+                sendSMS();
                 break;
-            case R.id.Time:
-
-
-                Calendar c1= Calendar.getInstance();
-                hours=c1.get(Calendar.HOUR_OF_DAY);
-                minutes=c1.get(Calendar.MINUTE);
-
-                TimePickerDialog timePicker= new TimePickerDialog(AddAppointmentActivity.this,AddAppointmentActivity.this,hours,minutes, DateFormat.is24HourFormat(this));
-                timePicker.show();
-                break;
-            case R.id.Date:
-
-                Calendar c=Calendar.getInstance();
-                year=c.get(Calendar.YEAR);
-                month=c.get(Calendar.MONTH);
-                day=c.get(Calendar.DAY_OF_MONTH);
-
-                DatePickerDialog datePicker= new DatePickerDialog(AddAppointmentActivity.this,AddAppointmentActivity.this,year,month,day);
-
-                datePicker.show();
-                break;
-
         }
     }
 
@@ -92,5 +131,34 @@ EditText time,date;
         minutesF=i1;
 
         time.setText(String.valueOf(hoursF)+" :"+String.valueOf(minutesF));
+    }
+
+    @Override
+    public void onFocusChange(View view, boolean b) {
+        switch (view.getId()){
+            case R.id.Time:
+
+                if(b){
+                Calendar c1= Calendar.getInstance();
+                hours=c1.get(Calendar.HOUR_OF_DAY);
+                minutes=c1.get(Calendar.MINUTE);
+
+                TimePickerDialog timePicker= new TimePickerDialog(AddAppointmentActivity.this,AddAppointmentActivity.this,hours,minutes, DateFormat.is24HourFormat(this));
+                timePicker.show();}
+                break;
+            case R.id.Date:
+
+                if(b){
+                Calendar c=Calendar.getInstance();
+                year=c.get(Calendar.YEAR);
+                month=c.get(Calendar.MONTH);
+                day=c.get(Calendar.DAY_OF_MONTH);
+
+                DatePickerDialog datePicker= new DatePickerDialog(AddAppointmentActivity.this,AddAppointmentActivity.this,year,month,day);
+
+                datePicker.show();}
+                break;
+
+        }
     }
 }
