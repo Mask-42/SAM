@@ -43,7 +43,7 @@ public class CallLogAdapter extends RecyclerView.Adapter<CallLogAdapter.DataObje
             @Override
             public void onClick(View view) {
                 Intent in= new Intent(con,AddAppointmentActivity.class);
-                in.putExtra("Phone",holder.phoneNo.getText().toString());
+                in.putExtra("Phone",holder.phoneNo.getText());
                 con.startActivity(in);
             }
         });
