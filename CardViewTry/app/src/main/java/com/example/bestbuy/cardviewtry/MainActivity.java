@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.CallLog;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     int j = 6;
     SwipeRefreshLayout srl;
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         {
             setTitle("Recent Received Calls");
-            srl=(SwipeRefreshLayout)findViewById(R.id.swipe1);
+            srl = (SwipeRefreshLayout) findViewById(R.id.swipe1);
             srl.setEnabled(false);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
@@ -58,13 +60,17 @@ public class MainActivity extends AppCompatActivity {
                 //                                          int[] grantResults)
                 // to handle the case where the user grants the permission. See the documentation
                 // for ActivityCompat#requestPermissions for more details.
+
+                String[] perms = new String[]{Manifest.permission.READ_CALL_LOG};
+                ActivityCompat.requestPermissions(this, perms, 10);
                 return;
             }
-            Cursor managedCursor = this.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, CallLog.Calls.DATE + " DESC");
+
+            Cursor managedCursor = managedQuery(CallLog.Calls.CONTENT_URI, null, null, null, CallLog.Calls.DATE + " DESC");
             managedCursor.moveToFirst();
             my_adapter = new CallLogAdapter(getCallLog(managedCursor),MainActivity.this);
             rv1.setAdapter(my_adapter);
-            managedCursor.close();
+        //    managedCursor.close();
         }
 
         /*{
@@ -87,6 +93,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
 
     private void refresh(){
         //*************WORKING WITH SWIPE REFRESH LAYOUT**************
@@ -200,6 +213,7 @@ final float ALPHA_FULL=1.0f;
       int type = mCursor.getColumnIndex(CallLog.Calls.TYPE);
         String callType = mCursor.getString(type);
         while(mCursor.moveToNext()){
+            callType = mCursor.getString(type);
             if(Integer.parseInt(callType)==CallLog.Calls.INCOMING_TYPE) {
                 i++;
                 CallDataProvider obj = new CallDataProvider(mCursor);
