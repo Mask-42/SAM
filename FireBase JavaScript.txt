@@ -1,0 +1,13 @@
+<script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyBuCXPVLdO8nuI3AzIlrPSrynR_uwaeVYk",
+    authDomain: "meet-secure.firebaseapp.com",
+    databaseURL: "https://meet-secure.firebaseio.com",
+    projectId: "meet-secure",
+    storageBucket: "meet-secure.appspot.com",
+    messagingSenderId: "856844766175"
+  };
+  firebase.initializeApp(config);
+</script>
